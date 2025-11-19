@@ -1,0 +1,68 @@
+{% extends "game/base.html" %}
+
+{% block content %}
+<div class="text-center mb-10 p-6 bg-gray-800 rounded-xl shadow-2xl border-b-4 border-purple-500">
+    <h1 class="text-4xl font-bold mb-2 text-purple-400">Panel de Control</h1>
+    <p class="text-xl text-gray-300">¡Hora de la verdad y las predicciones!</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 hover:border-yellow-500 transition duration-300 transform hover:-translate-y-1">
+        <h2 class="text-2xl font-semibold mb-4 text-yellow-400 flex items-center">
+            <i class="fas fa-file-contract mr-3 text-3xl"></i>
+            Mi Asignación
+        </h2>
+        {% if has_assigned %}
+            <p class="text-green-400 font-bold flex items-center gap-2">
+                <i class="fas fa-check-circle"></i> ¡Objetivo Fijado!
+            </p>
+            <p class="text-gray-400 mt-2 text-sm">Tu amigo secreto está encriptado y seguro.</p>
+        {% else %}
+            <p class="text-red-400 font-bold mb-3 flex items-center gap-2">
+                <i class="fas fa-exclamation-triangle"></i> Falta asignar
+            </p>
+            <a href="{% url 'set_target' %}" class="inline-block w-full text-center bg-yellow-600 hover:bg-yellow-700 text-gray-900 font-bold py-2 px-4 rounded-lg transition duration-300">
+                <i class="fas fa-user-plus mr-1"></i> Cargar Amigo Secreto
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 hover:border-blue-500 transition duration-300 transform hover:-translate-y-1">
+        <h2 class="text-2xl font-semibold mb-4 text-blue-400 flex items-center">
+            <i class="fas fa-magnifying-glass-chart mr-3 text-3xl"></i>
+            Tus Predicciones
+        </h2>
+        {% if pending_votes > 0 %}
+            <p class="text-gray-300 mb-3">Te quedan <strong class="text-white">{{ pending_votes }}</strong> predicciones.</p>
+            <a href="{% url 'voting_area' %}" class="inline-block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                <i class="fas fa-vote-yea mr-1"></i> Ir a Votar
+            </a>
+        {% else %}
+            <p class="text-green-500 font-bold flex items-center gap-2">
+                <i class="fas fa-check-double"></i> ¡Todo listo!
+            </p>
+            <p class="text-sm text-gray-400">Has votado por todos.</p>
+        {% endif %}
+    </div>
+
+    <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 hover:border-red-500 transition duration-300 transform hover:-translate-y-1">
+        <h2 class="text-2xl font-semibold mb-4 text-red-400 flex items-center">
+            <i class="fas fa-trophy mr-3 text-3xl"></i>
+            Resultados
+        </h2>
+        {% if is_reveal_time %}
+            <p class="text-green-500 font-bold mb-3">¡Resultados disponibles!</p>
+            <a href="{% url 'results' %}" class="inline-block w-full text-center bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                <i class="fas fa-chart-bar mr-1"></i> Ver Ganadores
+            </a>
+        {% else %}
+            <p class="text-gray-300 mb-1">Revelación programada:</p>
+            <p class="text-red-400 font-bold text-lg flex items-center gap-2">
+                <i class="far fa-clock"></i> {{ reveal_date|date:"d M, H:i" }}
+            </p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

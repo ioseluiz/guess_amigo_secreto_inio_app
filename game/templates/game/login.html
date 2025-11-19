@@ -1,0 +1,48 @@
+{% extends "game/base.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-10"> <div class="form-card bg-gray-800 p-8 rounded-xl shadow-2xl border border-purple-500/50">
+        <h2 class="text-3xl font-extrabold text-purple-400 mb-6 text-center">
+            <i class="fas fa-door-open mr-2"></i>Bienvenido
+        </h2>
+        
+        {% if form.errors %}
+            <div class="bg-red-900/50 border border-red-500 text-red-100 px-4 py-3 rounded-lg mb-4" role="alert">
+                <p class="font-bold"><i class="fas fa-exclamation-circle"></i> Error de Acceso</p>
+                <p class="text-sm">Credenciales incorrectas.</p>
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+                <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">Usuario</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-user text-gray-400"></i>
+                    </div>
+                    <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" class="pl-10 block w-full rounded-lg border-gray-600 bg-gray-700 text-white p-3 focus:border-purple-500 focus:ring focus:ring-purple-500/50 transition" required>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">Contraseña</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-gray-400"></i>
+                    </div>
+                    <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" class="pl-10 block w-full rounded-lg border-gray-600 bg-gray-700 text-white p-3 focus:border-purple-500 focus:ring focus:ring-purple-500/50 transition" required>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-lg hover:shadow-blue-500/50">
+                Ingresar
+            </button>
+        </form>
+        <p class="mt-4 text-center text-gray-400 text-sm">
+            ¿No tienes cuenta? <a href="{% url 'signup' %}" class="text-purple-400 hover:text-purple-300 font-semibold">Regístrate aquí</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

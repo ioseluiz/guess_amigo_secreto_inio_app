@@ -1,0 +1,35 @@
+{% extends "game/base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto mt-20">
+    <div class="text-center p-10 bg-red-900/40 rounded-xl shadow-2xl border border-red-500/50 backdrop-blur-sm">
+        <div class="mb-6">
+            <span class="inline-block p-4 rounded-full bg-red-900/50 border-4 border-red-500">
+                <i class="fas fa-hand-paper text-6xl text-red-400"></i>
+            </span>
+        </div>
+        
+        <h1 class="text-4xl font-bold text-red-400 mb-4">¡Alto, Detective!</h1>
+        <p class="text-xl text-gray-300 mb-6">Aún no es la fecha y hora programada para la gran revelación.</p>
+        
+        {% with settings=GameSettings.objects.first %}
+            <div class="bg-gray-800/50 p-4 rounded-lg inline-block mb-6">
+                {% if settings %}
+                    <p class="text-yellow-400 font-mono text-lg">
+                        <i class="fas fa-hourglass-half mr-2"></i>
+                        {{ settings.reveal_date|date:"l, F j, Y" }} — {{ settings.reveal_date|time:"H:i" }}
+                    </p>
+                {% else %}
+                    <p class="text-yellow-400 font-semibold">Fecha pendiente por el Admin.</p>
+                {% endif %}
+            </div>
+        {% endwith %}
+        
+        <div>
+            <a href="{% url 'dashboard' %}" class="inline-flex items-center bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+                <i class="fas fa-arrow-left mr-2"></i> Volver al Panel
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

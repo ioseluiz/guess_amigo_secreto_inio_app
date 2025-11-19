@@ -1,0 +1,82 @@
+{% extends "game/base.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-10"> 
+    
+    <div class="form-card bg-gray-800 p-8 rounded-xl shadow-2xl border border-purple-500/50">
+        <h2 class="text-3xl font-extrabold text-purple-400 mb-6 text-center">
+            <i class="fas fa-user-plus mr-2"></i>¡Únete al Juego!
+        </h2>
+
+        <style>
+            /* Estilo para los Inputs de Texto y Password */
+            .django-field input {
+                width: 100%;
+                background-color: rgb(55 65 81); /* Tailwind bg-gray-700 */
+                color: white;
+                border: 1px solid rgb(75 85 99); /* Tailwind border-gray-600 */
+                padding: 0.75rem; /* p-3 */
+                border-radius: 0.5rem; /* rounded-lg */
+                margin-top: 0.25rem;
+                transition: all 0.3s;
+            }
+            /* Efecto Focus (Borde morado) */
+            .django-field input:focus {
+                outline: none;
+                border-color: rgb(168 85 247); /* Tailwind border-purple-500 */
+                box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.5);
+            }
+            /* Texto de ayuda (ej: requisitos de contraseña) */
+            .django-field .helptext {
+                display: block;
+                font-size: 0.75rem; /* text-xs */
+                color: rgb(156 163 175); /* text-gray-400 */
+                margin-top: 0.25rem;
+            }
+            /* Listas de errores */
+            .django-field ul.errorlist {
+                color: rgb(248 113 113); /* text-red-400 */
+                font-size: 0.875rem;
+                list-style-type: none;
+                padding: 0;
+                margin-top: 0.25rem;
+            }
+        </style>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="mb-5 django-field">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-bold text-gray-300 mb-1">
+                        {{ field.label }}
+                    </label>
+                    
+                    {{ field }}
+
+                    {% if field.errors %}
+                        <div class="mt-1">
+                            {% for error in field.errors %}
+                                <p class="text-red-400 text-xs flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-1"></i> {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 mt-4 shadow-lg hover:shadow-purple-500/50">
+                <i class="fas fa-paper-plane mr-2"></i> Registrarse
+            </button>
+        </form>
+
+        <p class="mt-6 text-center text-gray-400 text-sm">
+            ¿Ya tienes cuenta? 
+            <a href="{% url 'login' %}" class="text-blue-400 hover:text-blue-300 font-semibold transition">
+                <i class="fas fa-sign-in-alt mr-1"></i> Inicia Sesión
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock %}

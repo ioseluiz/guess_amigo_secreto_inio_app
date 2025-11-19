@@ -1,0 +1,53 @@
+{% extends "game/base.html" %}
+
+{% block content %}
+<div class="bg-gray-800 p-8 rounded-xl shadow-2xl border border-blue-500/50">
+    <h1 class="text-3xl font-extrabold text-blue-400 mb-6 text-center">Área de Predicciones (Votos)</h1>
+    <p class="text-gray-400 mb-8 text-center">¿Quién crees que le regala a cada uno de tus compañeros?</p>
+
+    {% if not pending_targets %}
+        <div class="text-center p-10 bg-green-900/50 rounded-lg">
+            <p class="text-2xl font-bold text-green-400">🎉 ¡Felicidades! Has completado todas tus predicciones.</p>
+            <a href="{% url 'dashboard' %}" class="mt-4 inline-block text-white underline hover:text-green-300">Volver al Panel</a>
+        </div>
+    {% else %}
+        
+        {% for target_giver in pending_targets %}
+            <div class="bg-gray-700 p-5 mb-6 rounded-lg shadow-md">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="target_giver_id" value="{{ target_giver.id }}">
+                    
+                    <h3 class="text-xl font-semibold mb-3 text-white">
+                        ¿Quién crees que es el Amigo Secreto de **{{ target_giver.username }}**?
+                    </h3>
+
+                    <div class="flex flex-col sm:flex-row gap-4 items-center">
+                        <select name="guessed_receiver_id" class="flex-grow rounded-lg border-gray-600 bg-gray-900 text-white p-3 focus:border-blue-500 focus:ring focus:ring-blue-500/50" required>
+                            <option value="">--- Selecciona un Giver (Regalador) ---</option>
+                            {% for user in all_users %}
+                                {% comment %} 
+                                    Requisito: No incluir al Target Giver (la persona por la que votas) 
+                                    y no incluir al usuario que vota (tú mismo).
+                                {% endcomment %}
+                                {% if user != target_giver and user != request.user %}
+                                    <option value="{{ user.id }}">{{ user.username }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        
+                        <button type="submit" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                            Adivinar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        {% endfor %}
+
+        <div class="text-center mt-6">
+            <a href="{% url 'dashboard' %}" class="text-gray-400 hover:text-white text-sm underline">Terminar por ahora y volver al Panel</a>
+        </div>
+
+    {% endif %}
+</div>
+{% endblock %}
