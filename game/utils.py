@@ -1,15 +1,9 @@
 import os
 from cryptography.fernet import Fernet
 from django.conf import settings
-import base64
-
-# En settings.py you should define ENCRYPTION_KEY
-# Generate a key using Fernet.generate_key() and store it securely
 
 def get_cipher():
-    key = settings.ENCRYPTION_KEY
-    if not key:
-        raise ValueError("ENCRYPTION_KEY is not set in settings")
+    key = settings.ENCRYPTION_KEY # Asegúrate de tener esto en settings.py
     return Fernet(key)
 
 def encrypt_data(data: str) -> str:
@@ -19,10 +13,13 @@ def encrypt_data(data: str) -> str:
     return cipher.encrypt(data.encode('utf-8')).decode('utf-8')
 
 def decrypt_data(token: str) -> str:
-    if not encrypt_data:
+    # 1. Verificar el token, no la función
+    if not token: 
         return None
     cipher = get_cipher()
     try:
-        return cipher.decrypt(encrypt_data.encode('utf-8')).decode('utf-8')
-    except:
+        # 2. Usar la variable 'token'
+        return cipher.decrypt(token.encode('utf-8')).decode('utf-8')
+    except Exception as e:
+        print(f"Error desencriptando: {e}") # Útil para debug
         return "ERROR_DECRYPT"
