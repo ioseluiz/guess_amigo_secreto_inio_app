@@ -140,22 +140,22 @@ def results_dashboard(request):
 
         scoreboard.append({'username': u.username, 'points': points})
 
-        # Ordenar ganadores
-        scoreboard.sort(key=lambda x: x['points'], reverse=True)
-        winner = scoreboard[0] if scoreboard else None
+    # Ordenar ganadores
+    scoreboard.sort(key=lambda x: x['points'], reverse=True)
+    winner = scoreboard[0] if scoreboard else None
 
-        # Datos para Chart.js
-        chart_labels = [x['username'] for x in scoreboard]
-        chart_data = [x['points'] for x in scoreboard]
+    # Datos para Chart.js
+    chart_labels = [x['username'] for x in scoreboard]
+    chart_data = [x['points'] for x in scoreboard]
 
-        context = {
-        'winner': winner,
-        'scoreboard': scoreboard,
-        'chart_labels': json.dumps(chart_labels),
-        'chart_data': json.dumps(chart_data),
-        'accuracy': round((correct_guesses/total_votes)*100, 2) if total_votes > 0 else 0
+    context = {
+    'winner': winner,
+    'scoreboard': scoreboard,
+    'chart_labels': json.dumps(chart_labels),
+    'chart_data': json.dumps(chart_data),
+    'accuracy': round((correct_guesses/total_votes)*100, 2) if total_votes > 0 else 0
     }
         
-        return render(request, 'game/results.html', context)
+    return render(request, 'game/results.html', context)
 
 

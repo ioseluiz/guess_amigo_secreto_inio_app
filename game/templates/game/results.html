@@ -27,24 +27,66 @@
         <div class="bg-gray-900 p-6 rounded-lg shadow-xl border border-gray-700">
             <h3 class="text-2xl font-semibold mb-4 text-purple-300">Ranking Completo</h3>
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-700">
-                    <thead>
-                        <tr>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">#</th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Usuario</th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Aciertos</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-800">
-                        {% for item in scoreboard %}
-                            <tr class="{% if item.username == winner.username and winner.points > 0 %}bg-yellow-500/20{% else %}hover:bg-gray-800{% endif %}">
-                                <td class="px-3 py-4 whitespace-nowrap text-sm font-medium text-white">{{ forloop.counter }}</td>
-                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-200">{{ item.username }}</td>
-                                <td class="px-3 py-4 whitespace-nowrap text-sm font-bold text-green-400">{{ item.points }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="bg-gray-900 p-6 rounded-lg shadow-xl border border-gray-700">
+    <h3 class="text-2xl font-semibold mb-4 text-purple-300">Ranking y Transparencia</h3>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-700">
+            <thead>
+                <tr>
+                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">#</th>
+                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Detective</th>
+                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider text-center">Puntos</th>
+                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Historial de Votos</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800">
+                {% for item in scoreboard %}
+                    <tr class="{% if item.username == winner.username and winner.points > 0 %}bg-yellow-500/10{% else %}hover:bg-gray-800{% endif %} transition">
+                        
+                        <td class="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
+                            {% if forloop.counter == 1 and item.points > 0 %}🥇{% elif forloop.counter == 2 %}🥈{% elif forloop.counter == 3 %}🥉{% else %}{{ forloop.counter }}{% endif %}
+                        </td>
+                        
+                        <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-200 font-bold">
+                            {{ item.username }}
+                        </td>
+                        
+                        <td class="px-3 py-4 whitespace-nowrap text-sm font-bold text-center">
+                            <span class="px-3 py-1 rounded-full {% if item.points > 0 %}bg-green-900 text-green-300{% else %}bg-gray-700 text-gray-400{% endif %}">
+                                {{ item.points }}
+                            </span>
+                        </td>
+
+                        <td class="px-3 py-4 text-sm text-gray-300">
+                            {% if item.vote_details %}
+                                <div class="flex flex-wrap gap-2">
+                                    {% for vote in item.vote_details %}
+                                        <div class="text-xs border rounded px-2 py-1 flex items-center gap-1 
+                                            {% if vote.is_correct %}border-green-500 bg-green-900/30 text-green-200{% else %}border-red-500 bg-red-900/30 text-red-200{% endif %}"
+                                            title="Realidad: {{ vote.target }} le regalaba a {{ vote.real }}">
+                                            
+                                            {% if vote.is_correct %}
+                                                <i class="fas fa-check"></i>
+                                            {% else %}
+                                                <i class="fas fa-times"></i>
+                                            {% endif %}
+
+                                            <span>{{ vote.target }} ➡ {{ vote.guessed }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <span class="text-gray-600 italic text-xs">No votó</span>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="mt-4 text-sm text-gray-400">Tasa de acierto general: <span class="font-bold text-blue-400">{{ accuracy }}%</span></p>
+</div>
             </div>
             <p class="mt-4 text-sm text-gray-400">Tasa de acierto general: <span class="font-bold text-blue-400">{{ accuracy }}%</span></p>
         </div>
