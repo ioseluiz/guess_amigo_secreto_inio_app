@@ -24,30 +24,29 @@
                 </div>
             {% else %}
                 
-                {% for target_giver in pending_targets %}
+                {% for target_receiver in pending_targets %}
                     <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-blue-500/30 hover:border-blue-500/60 transition duration-300">
                         <form method="post">
                             {% csrf_token %}
-                            <input type="hidden" name="target_giver_id" value="{{ target_giver.id }}">
+                            <input type="hidden" name="target_giver_id" value="{{ target_receiver.id }}">
                             
                             <div class="flex flex-col sm:flex-row items-center gap-4">
                                 <div class="flex-grow text-center sm:text-left">
-                                    <span class="text-xs text-blue-300 uppercase font-bold tracking-wider">¿Quién tiene a...?</span>
+                                    <span class="text-xs text-blue-300 uppercase font-bold tracking-wider">¿Quién le regala a...?</span>
                                     <h3 class="text-xl font-bold text-white mt-1">
-                                        <i class="fas fa-gift text-yellow-500 mr-2"></i> {{ target_giver.username }}
+                                        <i class="fas fa-gift text-yellow-500 mr-2"></i> {{ target_receiver.username }}
                                     </h3>
                                 </div>
 
                                 <div class="hidden sm:block text-gray-500">
-                                    <i class="fas fa-arrow-right"></i>
-                                </div>
+                                    <i class="fas fa-arrow-left"></i> </div>
 
                                 <div class="w-full sm:w-auto flex-grow">
                                     <select name="guessed_receiver_id" class="w-full rounded-lg border-gray-600 bg-gray-700 text-white p-3 focus:border-blue-500 focus:ring focus:ring-blue-500/50" required>
-                                        <option value="">--- Selecciona a quien regala ---</option>
-                                        {% for user in all_users %}
-                                            {% if user != target_giver and user != request.user %}
-                                                <option value="{{ user.id }}">{{ user.username }}</option>
+                                        <option value="">--- Selecciona al Santa ---</option>
+                                        {% for santa in all_users %}
+                                            {% if santa != target_receiver %}
+                                                <option value="{{ santa.id }}">{{ santa.username }}</option>
                                             {% endif %}
                                         {% endfor %}
                                     </select>
@@ -75,17 +74,17 @@
                         <table class="min-w-full divide-y divide-gray-700 text-sm">
                             <thead class="bg-gray-900">
                                 <tr>
-                                    <th class="px-3 py-2 text-left text-gray-400 font-medium">Santa</th>
-                                    <th class="px-3 py-2 text-center text-gray-500"><i class="fas fa-arrow-right"></i></th>
-                                    <th class="px-3 py-2 text-left text-gray-400 font-medium">Regala a</th>
+                                    <th class="px-3 py-2 text-left text-gray-400 font-medium">Santa (Tú dices)</th>
+                                    <th class="px-3 py-2 text-center text-gray-500">➜</th>
+                                    <th class="px-3 py-2 text-left text-gray-400 font-medium">Recibe</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-700 bg-gray-800">
                                 {% for vote in my_votes %}
                                     <tr class="hover:bg-gray-700 transition">
-                                        <td class="px-3 py-2 text-white font-semibold">{{ vote.target_giver.username }}</td>
+                                        <td class="px-3 py-2 text-blue-300 font-semibold">{{ vote.get_guess }}</td>
                                         <td class="px-3 py-2 text-center text-gray-500">➜</td>
-                                        <td class="px-3 py-2 text-blue-300">{{ vote.get_guess }}</td>
+                                        <td class="px-3 py-2 text-white">{{ vote.target_giver.username }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
