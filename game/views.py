@@ -64,6 +64,39 @@ def set_my_target(request):
     return render(request, "game/set_target.html", {"users": users})
 
 
+# --- NUEVA VISTA PARA ELIMINAR VOTO ---
+@login_required
+def delete_vote(request, vote_id):
+    # 1. Obtener el voto asegurando que pertenece al usuario actual
+    vote = get_object_or_404(Vote, id=vote_id, voter=request.user)
+
+    # 2. Verificar FECHA LÍMITE
+    settings_obj = GameSettings.objects.first()
+    if settings_obj and timezone.now() >= settings_obj.reveal_date:
+        messages.error(
+            request, "🚫 ¡El tiempo ha terminado! Ya no puedes cambiar tus votos."
+        )
+        return redirect("voting_area")
+
+    # 3. Verificar que NO sea el Auto-Voto (el voto sobre mi propio regalo)
+    #    Si el usuario predijo que "él mismo" regala, es el voto fijo del sistema.
+    if vote.get_guess() == request.user.username:
+        messages.warning(
+            request, "No puedes eliminar la asignación de tu propio Amigo Secreto."
+        )
+        return redirect("voting_area")
+
+    # 4. Eliminar
+    target_name = vote.target_giver.username
+    vote.delete()
+    messages.info(
+        request,
+        f"Has retirado tu predicción sobre {target_name}. ¡Vuelve a intentarlo!",
+    )
+
+    return redirect("voting_area")
+
+
 @login_required
 def voting_area(request):
     # 1. Validación: Obligar a asignar regalo antes de votar
@@ -75,7 +108,7 @@ def voting_area(request):
         )
         return redirect("set_target")
 
-    # 2. AUTO-VOTO: Registrar que YO le regalo a MI AMIGO SECRETO
+    # 2. AUTO-VOTO
     try:
         my_assignment = Assignment.objects.get(giver=request.user)
         my_giftee_username = my_assignment.get_receiver()
@@ -85,7 +118,6 @@ def voting_area(request):
             auto_vote, created = Vote.objects.get_or_create(
                 voter=request.user, target_giver=my_giftee_user
             )
-            # Forzamos la predicción correcta (Yo -> Mi objetivo)
             if created or auto_vote.get_guess() != request.user.username:
                 auto_vote.set_guess(request.user.username)
 
@@ -94,6 +126,12 @@ def voting_area(request):
 
     # 3. PROCESAR VOTO MANUAL (POST)
     if request.method == "POST":
+        # Validar fecha antes de aceptar el voto POST también
+        settings_obj = GameSettings.objects.first()
+        if settings_obj and timezone.now() >= settings_obj.reveal_date:
+            messages.error(request, "🚫 ¡Tiempo agotado! No se guardaron los cambios.")
+            return redirect("voting_area")
+
         target_receiver_id = request.POST.get("target_giver_id")
         guessed_santa_id = request.POST.get("guessed_receiver_id")
 
@@ -112,39 +150,37 @@ def voting_area(request):
             )
         return redirect("voting_area")
 
-    # 4. PREPARACIÓN INTELIGENTE DE DATOS
-
-    # A. Obtener TODOS mis votos actuales
+    # 4. PREPARACIÓN DE DATOS
     my_votes = Vote.objects.filter(voter=request.user).select_related("target_giver")
 
-    # B. Extraer IDs de tarjetas ya resueltas y Nombres de Santas ya usados
     voted_target_ids = []
     used_santa_usernames = set()
 
     for vote in my_votes:
-        voted_target_ids.append(vote.target_giver_id)  # IDs de las tarjetas completadas
+        voted_target_ids.append(vote.target_giver_id)
         guess = vote.get_guess()
         if guess:
-            used_santa_usernames.add(guess)  # Nombres de los Santas que ya "gasté"
+            used_santa_usernames.add(guess)
 
-    # C. Filtrar Tarjetas Pendientes (Receptores)
     pending_targets = User.objects.all()
-    pending_targets = pending_targets.exclude(id=request.user.id)  # No me adivino a mí
-    pending_targets = pending_targets.exclude(
-        id__in=voted_target_ids
-    )  # No muestro los que ya voté
+    pending_targets = pending_targets.exclude(id=request.user.id)
+    pending_targets = pending_targets.exclude(id__in=voted_target_ids)
 
-    # D. Filtrar Dropdown (Santas Disponibles)
-    #    Excluye:
-    #    1. A mí mismo (request.user.id) -> Ya estoy "gastado" en el Auto-Voto
-    #    2. A cualquier usuario que ya haya seleccionado en otra predicción (used_santa_usernames)
     possible_santas = User.objects.exclude(id=request.user.id)
     possible_santas = possible_santas.exclude(username__in=used_santa_usernames)
 
+    # --- NUEVO: Determinar si se puede editar ---
+    settings_obj = GameSettings.objects.first()
+    can_edit = True
+    if settings_obj and timezone.now() >= settings_obj.reveal_date:
+        can_edit = False
+    # ---------------------------------------------
+
     context = {
         "pending_targets": pending_targets,
-        "all_users": possible_santas,  # Esta lista ahora se va reduciendo dinámicamente
+        "all_users": possible_santas,
         "my_votes": my_votes,
+        "can_edit": can_edit,  # Enviamos esto al template
     }
 
     return render(request, "game/voting_area.html", context)

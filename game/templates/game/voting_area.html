@@ -5,13 +5,23 @@
     <div class="text-center mb-8">
         <h1 class="text-3xl font-extrabold text-blue-400">Área de Predicciones</h1>
         <p class="text-gray-400">Intenta adivinar quién es el Amigo Secreto de cada compañero.</p>
+        
+        {% if not can_edit %}
+            <div class="mt-2 inline-block bg-red-900/50 border border-red-500 px-4 py-2 rounded-lg text-red-200 text-sm">
+                <i class="fas fa-lock mr-2"></i> Las votaciones están cerradas.
+            </div>
+        {% endif %}
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <div class="lg:col-span-2 space-y-6">
             
-            {% if not pending_targets %}
+            {% if not can_edit and pending_targets %}
+                 <div class="text-center py-10 bg-gray-800 rounded-xl">
+                    <p class="text-gray-400">El tiempo de votación ha terminado.</p>
+                 </div>
+            {% elif not pending_targets %}
                 <div class="bg-green-900/20 border border-green-500 p-8 rounded-xl text-center shadow-lg">
                     <div class="inline-block p-4 bg-green-900 rounded-full mb-4">
                         <i class="fas fa-check-double text-4xl text-green-400"></i>
@@ -39,7 +49,8 @@
                                 </div>
 
                                 <div class="hidden sm:block text-gray-500">
-                                    <i class="fas fa-arrow-left"></i> </div>
+                                    <i class="fas fa-arrow-left"></i>
+                                </div>
 
                                 <div class="w-full sm:w-auto flex-grow">
                                     <select name="guessed_receiver_id" class="w-full rounded-lg border-gray-600 bg-gray-700 text-white p-3 focus:border-blue-500 focus:ring focus:ring-blue-500/50" required>
@@ -74,17 +85,35 @@
                         <table class="min-w-full divide-y divide-gray-700 text-sm">
                             <thead class="bg-gray-900">
                                 <tr>
-                                    <th class="px-3 py-2 text-left text-gray-400 font-medium">Santa (Tú dices)</th>
-                                    <th class="px-3 py-2 text-center text-gray-500">➜</th>
+                                    <th class="px-3 py-2 text-left text-gray-400 font-medium">Santa</th>
+                                    <th class="px-1 py-2 text-center text-gray-500">➜</th>
                                     <th class="px-3 py-2 text-left text-gray-400 font-medium">Recibe</th>
+                                    {% if can_edit %}
+                                        <th class="px-2 py-2"></th>
+                                    {% endif %}
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-700 bg-gray-800">
                                 {% for vote in my_votes %}
-                                    <tr class="hover:bg-gray-700 transition">
+                                    <tr class="hover:bg-gray-700 transition group">
                                         <td class="px-3 py-2 text-blue-300 font-semibold">{{ vote.get_guess }}</td>
-                                        <td class="px-3 py-2 text-center text-gray-500">➜</td>
+                                        <td class="px-1 py-2 text-center text-gray-500">➜</td>
                                         <td class="px-3 py-2 text-white">{{ vote.target_giver.username }}</td>
+                                        
+                                        {% if can_edit %}
+                                            <td class="px-2 py-2 text-right">
+                                                {% if vote.get_guess != request.user.username %}
+                                                    <form method="post" action="{% url 'delete_vote' vote.id %}" onsubmit="return confirm('¿Quieres cambiar este voto?');">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="text-gray-500 hover:text-red-400 transition" title="Cambiar voto">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                {% else %}
+                                                    <span class="text-gray-600 text-xs italic"><i class="fas fa-lock"></i></span>
+                                                {% endif %}
+                                            </td>
+                                        {% endif %}
                                     </tr>
                                 {% endfor %}
                             </tbody>
