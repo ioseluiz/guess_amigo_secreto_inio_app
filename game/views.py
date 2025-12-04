@@ -163,7 +163,7 @@ def voting_area(request):
             used_santa_usernames.add(guess)
 
     pending_targets = User.objects.all()
-    pending_targets = pending_targets.exclude(id=request.user.id)
+    #pending_targets = pending_targets.exclude(id=request.user.id)
     pending_targets = pending_targets.exclude(id__in=voted_target_ids)
 
     possible_santas = User.objects.exclude(id=request.user.id)
