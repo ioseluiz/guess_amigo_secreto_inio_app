@@ -239,7 +239,11 @@ def results_dashboard(request):
         )
 
     scoreboard.sort(key=lambda x: x["points"], reverse=True)
-    winner = scoreboard[0] if scoreboard else None
+    winners = []
+    if scoreboard:
+        max_points = scoreboard[0]["points"]
+        # Creamos una lista con todos los que tengan ese puntaje máximo
+        winners = [s for s in scoreboard if s["points"] == max_points]
 
     official_assignments = [
         {"giver": a.giver.username, "receiver": a.get_receiver()} for a in assignments
@@ -248,7 +252,7 @@ def results_dashboard(request):
     chart_data = [x["points"] for x in scoreboard]
 
     context = {
-        "winner": winner,
+        "winners": winners,
         "scoreboard": scoreboard,
         "official_assignments": official_assignments,
         "chart_labels": json.dumps(chart_labels),

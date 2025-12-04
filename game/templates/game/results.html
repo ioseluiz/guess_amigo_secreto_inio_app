@@ -4,17 +4,18 @@
 <div class="p-6 bg-gray-800 rounded-xl shadow-2xl">
     <h1 class="text-4xl font-bold mb-8 text-green-400 text-center">🏆 Resultados Finales</h1>
     
-    {% if winner %}
-        <div class="text-center mb-10 p-6 bg-green-900/50 rounded-xl border border-green-500">
-            <h2 class="text-3xl font-extrabold text-green-300">¡El Mejor Detective es...</h2>
-            <p class="text-5xl font-black text-white mt-2">{{ winner.username|upper }}</p>
-            <p class="text-xl text-green-200">Con **{{ winner.points }}** aciertos.</p>
-        </div>
-    {% else %}
-        <div class="text-center mb-10 p-6 bg-yellow-900/50 rounded-xl border border-yellow-500">
-            <h2 class="text-3xl font-extrabold text-yellow-300">Aún no hay votos suficientes.</h2>
-        </div>
-    {% endif %}
+   {% if winners %}
+    <div class="alert alert-success">
+        <h2>🎉 ¡Ganadores! 🎉</h2>
+        <ul>
+            {% for winner in winners %}
+                <li>
+                    <strong>{{ winner.username }}</strong> con {{ winner.points }} puntos.
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
         
